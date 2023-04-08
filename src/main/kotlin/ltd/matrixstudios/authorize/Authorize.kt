@@ -8,6 +8,7 @@ import ltd.matrixstudios.authorize.controller.Controller
 import ltd.matrixstudios.authorize.controller.JsonTransformer
 import ltd.matrixstudios.authorize.controller.route.Path
 import ltd.matrixstudios.authorize.controller.route.methods.*
+import ltd.matrixstudios.authorize.filters.RequestFilter
 import ltd.matrixstudios.authorize.license.controller.LicenseController
 import ltd.matrixstudios.authorize.license.mongo.LicenseContainer
 import ltd.matrixstudios.authorize.util.logger.APILogger
@@ -30,14 +31,33 @@ object Authorize {
     val gson: Gson = GsonBuilder().serializeNulls().setLongSerializationPolicy(LongSerializationPolicy.STRING).create()
 
     fun load() {
-        server.service.port(4223)
-        server.ipAddress("127.0.0.1")
+        val port = 4223
+        val host = "127.0.0.1"
+
+        server.service.port(port)
+        server.ipAddress(host)
+
+        APILogger.info("                _   _                _         \n" +
+                "     /\\        | | | |              (_)        \n" +
+                "    /  \\  _   _| |_| |__   ___  _ __ _ _______ \n" +
+                "   / /\\ \\| | | | __| '_ \\ / _ \\| '__| |_  / _ \\\n" +
+                "  / ____ \\ |_| | |_| | | | (_) | |  | |/ /  __/\n" +
+                " /_/    \\_\\__,_|\\__|_| |_|\\___/|_|  |_/___\\___|\n" +
+                "                                               ")
+
+        APILogger.info("Using host $host with port $port")
 
         server.service.before { request, _ ->
             APILogger.info("[INBOUND] Incoming request")
             APILogger.info(request.ip())
             APILogger.info(request.pathInfo())
         }
+
+       server.service.before("/*")
+        { request, response ->
+            RequestFilter.handleRequest(request, response)
+        }
+
 
         Jasper.createClient("mongodb://localhost:27017", "Authorize")
 

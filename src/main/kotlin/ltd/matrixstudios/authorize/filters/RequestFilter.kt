@@ -9,7 +9,7 @@ object RequestFilter {
     //make this whatever u want
     private const val key = "AuthorizeKey12345"
 
-    private fun handleRequest(request: Request, response: Response) {
+    fun handleRequest(request: Request, response: Response) {
         response.type("application/json")
 
         val apiKey = request.headers("Authorize-API-Key")
