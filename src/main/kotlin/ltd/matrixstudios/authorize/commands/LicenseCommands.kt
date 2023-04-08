@@ -12,7 +12,7 @@ class LicenseCommands {
     @Command("create")
     fun create(actor: CommandLineActor, name: String)
     {
-        val model = License(name, "Change", mutableListOf(), Long.MAX_VALUE, false, System.currentTimeMillis())
+        val model = License(name, "Change", mutableListOf(), Long.MAX_VALUE, false, System.currentTimeMillis(), "Test")
         LicenseContainer.save(model)
 
         APILogger.info("[COMMAND] Created a new license and sent to mongo")
@@ -29,7 +29,8 @@ class LicenseCommands {
                 mutableListOf(),
                 Long.MAX_VALUE,
                 false,
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
+                "Test"
             )
             LicenseContainer.save(model)
 

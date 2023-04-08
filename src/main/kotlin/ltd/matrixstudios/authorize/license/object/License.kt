@@ -9,5 +9,6 @@ data class License(
     var ip: MutableList<String>,
     var duration: Long,
     var admin: Boolean,
-    var addedAt: Long
+    var addedAt: Long,
+    var product: String
 )

@@ -1,5 +1,6 @@
 package ltd.matrixstudios.authorize
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.LongSerializationPolicy
 import ltd.matrixstudios.authorize.commands.CommandManager
@@ -22,17 +23,17 @@ import kotlin.reflect.full.starProjectedType
 
 object Authorize {
 
-    val server = ignite()
+    private val server = ignite()
 
     private val controllers = hashSetOf<KClass<out Controller>>(LicenseController::class)
 
-    val gson = GsonBuilder().serializeNulls().setLongSerializationPolicy(LongSerializationPolicy.STRING).create()
+    val gson: Gson = GsonBuilder().serializeNulls().setLongSerializationPolicy(LongSerializationPolicy.STRING).create()
 
     fun load() {
         server.service.port(4223)
         server.ipAddress("127.0.0.1")
 
-        server.service.before { request, response ->
+        server.service.before { request, _ ->
             APILogger.info("[INBOUND] Incoming request")
             APILogger.info(request.ip())
             APILogger.info(request.pathInfo())

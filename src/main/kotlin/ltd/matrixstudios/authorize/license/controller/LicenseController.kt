@@ -1,5 +1,7 @@
 package ltd.matrixstudios.authorize.license.controller
 
+import com.google.gson.JsonObject
+import ltd.matrixstudios.authorize.Authorize
 import ltd.matrixstudios.authorize.controller.Controller
 import ltd.matrixstudios.authorize.controller.route.Path
 import ltd.matrixstudios.authorize.controller.route.methods.GET
@@ -14,7 +16,7 @@ import spark.kotlin.halt
 object LicenseController : Controller {
     override fun load() {}
 
-    @GET
+    @POST
     @Path("/verify/:id")
     fun verifyLicense(): Route {
         return Route { request, response ->
@@ -22,24 +24,19 @@ object LicenseController : Controller {
             val startLookup = System.currentTimeMillis()
             val item = LicenseContainer.getFromCache(pathId)
 
-            if (item == null) {
-                return@Route false
-            }
+            val body = Authorize.gson.fromJson(request.body(), JsonObject::class.java)
+
+            if (item == null) return@Route false
+
+            if (body == null || body.isEmpty) return@Route false
+
+            val productKey: String = body["product"].asString ?: return@Route false
+
+            if (productKey == item.product) return@Route true
 
             APILogger.info("[METRIC] Fetch from mongo took ${System.currentTimeMillis().minus(startLookup)}ms")
 
-            return@Route true
-        }
-    }
-
-    @POST
-    @Path("/create/:id")
-    fun create() : Route {
-        return Route { request, response ->
-            val pathId = request.params(":id") ?: return@Route halt(404)
-            val license = License(pathId, "Change", mutableListOf(), Long.MAX_VALUE, false, System.currentTimeMillis())
-
-            return@Route license
+            return@Route false
         }
     }
 }
